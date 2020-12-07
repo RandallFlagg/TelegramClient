@@ -1,0 +1,78 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramClient", "Client\TelegramClient.csproj", "{9B881F8C-F53B-4146-80D5-76319535D20D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TLSharp.CoreCore", "..\..\Lib\TLSharp\TLSharp.Core\TLSharp.CoreCore.csproj", "{20E1BB6F-7710-42AD-A66B-8AFADC9AE22D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeleSharp.TLCore", "..\..\Lib\TLSharp\TeleSharp.TL\TeleSharp.TLCore.csproj", "{FD77E7BE-1AE2-4300-AE97-3765DAEAB3FD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal.Gui", "..\..\..\..\gui.cs\Terminal.Gui\Terminal.Gui.csproj", "{E886D492-99BD-42E6-9C7E-D3B180AF656D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B881F8C-F53B-4146-80D5-76319535D20D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B881F8C-F53B-4146-80D5-76319535D20D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B881F8C-F53B-4146-80D5-76319535D20D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B881F8C-F53B-4146-80D5-76319535D20D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20E1BB6F-7710-42AD-A66B-8AFADC9AE22D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20E1BB6F-7710-42AD-A66B-8AFADC9AE22D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20E1BB6F-7710-42AD-A66B-8AFADC9AE22D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20E1BB6F-7710-42AD-A66B-8AFADC9AE22D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD77E7BE-1AE2-4300-AE97-3765DAEAB3FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD77E7BE-1AE2-4300-AE97-3765DAEAB3FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD77E7BE-1AE2-4300-AE97-3765DAEAB3FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD77E7BE-1AE2-4300-AE97-3765DAEAB3FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E886D492-99BD-42E6-9C7E-D3B180AF656D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E886D492-99BD-42E6-9C7E-D3B180AF656D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E886D492-99BD-42E6-9C7E-D3B180AF656D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E886D492-99BD-42E6-9C7E-D3B180AF656D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C0D9DE0D-AA46-4577-BC6D-503566D66136}
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.inheritsSet = VisualStudio
+		$1.inheritsScope = text/plain
+		$1.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $2
+		$2.IndentSwitchBody = True
+		$2.IndentBlocksInsideExpressions = True
+		$2.AnonymousMethodBraceStyle = NextLine
+		$2.PropertyBraceStyle = NextLine
+		$2.PropertyGetBraceStyle = NextLine
+		$2.PropertySetBraceStyle = NextLine
+		$2.EventBraceStyle = NextLine
+		$2.EventAddBraceStyle = NextLine
+		$2.EventRemoveBraceStyle = NextLine
+		$2.StatementBraceStyle = NextLine
+		$2.ElseNewLinePlacement = NewLine
+		$2.CatchNewLinePlacement = NewLine
+		$2.FinallyNewLinePlacement = NewLine
+		$2.WhileNewLinePlacement = DoNotCare
+		$2.ArrayInitializerWrapping = DoNotChange
+		$2.ArrayInitializerBraceStyle = NextLine
+		$2.BeforeMethodDeclarationParentheses = False
+		$2.BeforeMethodCallParentheses = False
+		$2.BeforeConstructorDeclarationParentheses = False
+		$2.NewLineBeforeConstructorInitializerColon = NewLine
+		$2.NewLineAfterConstructorInitializerColon = SameLine
+		$2.BeforeDelegateDeclarationParentheses = False
+		$2.NewParentheses = False
+		$2.SpacesBeforeBrackets = False
+		$2.inheritsSet = Mono
+		$2.inheritsScope = text/x-csharp
+		$2.scope = text/x-csharp
+	EndGlobalSection
+EndGlobal
