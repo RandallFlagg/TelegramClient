@@ -1,4 +1,5 @@
-﻿using Terminal.Gui;
+﻿using System;
+using Terminal.Gui;
 
 namespace TelegramClient
 {
@@ -6,6 +7,7 @@ namespace TelegramClient
     {
         public TelegramTerminalClient()
         {
+            int x = 5;
             //Application.Init();
             //var top = Application.Top;
 
@@ -22,14 +24,16 @@ namespace TelegramClient
 
             //top.Add(win);
 
+
+
             // Creates a menubar, the item "New" has a help menu.
             var menu = new MenuBar(new MenuBarItem[] {
-                new MenuBarItem ("_File", new MenuItem [] {
+                new MenuBarItem ("_File", new[] {
                     new MenuItem ("_New", "Creates new file", NewFile),
-                    new MenuItem ("_Close", "", () => Close ()),
+                    new MenuItem ("_Close", "", Close),
                     new MenuItem ("_Quit", "", () => { if (Quit ()) this.Running = false; }) //top.Running => this.Running
                 }),
-                new MenuBarItem ("_Edit", new MenuItem [] {
+                new MenuBarItem ("_Edit", new[] {
                     new MenuItem ("_Copy", "", null),
                     new MenuItem ("C_ut", "", null),
                     new MenuItem ("_Paste", "", null)
@@ -37,7 +41,11 @@ namespace TelegramClient
             });
             this.Add(menu);//top=> this
 
-            var login = new Label("Login: ") { X = 3, Y = 2 };
+            var login = new Label("Phone Number: ")
+            {
+                X = 3,
+                Y = 2
+            };
             var password = new Label("Password: ")
             {
                 X = Pos.Left(login),
@@ -45,33 +53,55 @@ namespace TelegramClient
             };
             var loginText = new TextField("")
             {
-                X = Pos.Right(password),
+                X = Pos.Right(login),//Max(Pos.Right(password), Pos.Right(login)),
                 Y = Pos.Top(login),
                 Width = 40
             };
             var passText = new TextField("")
             {
-                Secret = true,
+                Secret = false,
                 X = Pos.Left(loginText),
                 Y = Pos.Top(password),
                 Width = Dim.Width(loginText)
             };
 
+            var btnLogin = new Button(3, 14, "Login");
+            btnLogin.Clicked += Clicked;
+            //btnLogin.MouseClick += MyMouseClick;
+            var btnExit = new Button(10, 14, "Exit");
+            btnExit.Clicked += () => Quit();
             // Add some controls, 
             this.Add( //win => this
-                // The ones with my favorite layout system, Computed
+                      // The ones with my favorite layout system, Computed
                 login, password, loginText, passText,
 
                 // The ones laid out like an australopithecus, with Absolute positions:
                 new CheckBox(3, 6, "Remember me"),
                 //new RadioGroup(3, 8, new[] { "_Personal", "_Company" }),
-                new Button(3, 14, "Ok"),
-                new Button(10, 14, "Cancel"),
+                btnLogin,
+                btnExit,
                 new Label(3, 18, "Press F9 or ESC plus 9 to activate the menubar")
             );
 
             //Application.Run();
         }
+
+        //private Pos Max(Pos i1, Pos i2)
+        //{
+        //    return i1.X > i2.X ? i1 : i2;
+        //}
+
+        private void Clicked()
+        {
+            int x = 5;
+            //throw new NotImplementedException();
+        }
+
+        //private void MyMouseClick(MouseEventArgs obj)
+        //{
+        //    int x = 6;
+        //    //throw new NotImplementedException();
+        //}
 
         private bool Quit()
         {
