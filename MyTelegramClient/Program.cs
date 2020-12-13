@@ -10,7 +10,7 @@ namespace TelegramClient
     {
         static void Main(string[] args)
         {
-            Application.Run<TelegramTerminalClient>();
+            Application.Run<TelegramTerminalClientWindow>();
             //StartClient();
             //Console.WriteLine("Press any key to exit");
             //Console.ReadLine();

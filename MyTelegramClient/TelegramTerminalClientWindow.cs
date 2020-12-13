@@ -3,9 +3,9 @@ using Terminal.Gui;
 
 namespace TelegramClient
 {
-    internal class TelegramTerminalClient : Window
+    internal class TelegramTerminalClientWindow : Window
     {
-        public TelegramTerminalClient()
+        public TelegramTerminalClientWindow()
         {
             int x = 5;
             //Application.Init();
