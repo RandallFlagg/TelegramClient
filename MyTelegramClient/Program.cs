@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Hosting;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TeleSharp.TL;
@@ -8,9 +9,17 @@ namespace TelegramClient
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Application.Run<TelegramTerminalClientWindow>();
+            using IHost host = CreateHostBuilder(args).Build();
+
+            Application.Init();
+            // Application code should start here.
+
+            //await host.RunAsync();
+            Application.Run(new TelegramTerminalClientWindow());
+            //Application.Run<TelegramTerminalClientWindow>();
+            //Application.Run();
             //StartClient();
             //Console.WriteLine("Press any key to exit");
             //Console.ReadLine();
@@ -18,9 +27,11 @@ namespace TelegramClient
 
         //using Terminal.Gui;
 
+        static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args);
 
 
-    private static async Task StartClient()
+        private static async Task StartClient()
         {
             try
             {
