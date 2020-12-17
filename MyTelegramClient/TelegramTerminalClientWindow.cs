@@ -26,9 +26,19 @@ namespace TelegramClient
         #region Constructors
         public TelegramTerminalClientWindow()
         {
-            this.Loaded += TelegramTerminalClientWindow_LoadedAsync;
+            //this.Loaded += TelegramTerminalClientWindow_LoadedAsync;
+            //this.Ready += TelegramTerminalClientWindow_Ready;
+            //this.Added += TelegramTerminalClientWindow_Added;
+            //this.DrawContent += TelegramTerminalClientWindow_DrawContent;
+            //this.Enter += TelegramTerminalClientWindow_Enter;
+            //this.Initialized += TelegramTerminalClientWindow_Initialized;
+            //this.LayoutComplete += TelegramTerminalClientWindow_LayoutComplete;
+            //this.LayoutStarted += TelegramTerminalClientWindow_LayoutStarted;
+            //this.Leave += TelegramTerminalClientWindow_Leave;
+            //this.Removed += TelegramTerminalClientWindow_Removed;
+            //this.Unloaded += TelegramTerminalClientWindow_Unloaded;
+
             var top = Application.Top;
-            top.Add(this);
 
             _colorScheme = new ColorScheme();
 
@@ -38,14 +48,73 @@ namespace TelegramClient
 
             // By using Dim.Fill(), it will automatically resize without manual intervention
             this.Width = Dim.Fill();
-            this.Height = Dim.Fill();
+            this.Height = Dim.Fill(1);
+
+            this.Add(new FrameView("TEST1")
+            {
+                Width = 25,
+                Height = 25,
+                X = 0,
+                Y = 1 // for menu
+            });
 
             var apiId = ;
             var apiHash = "";
+
             _client = new TLSharp.Core.TelegramClient(apiId, apiHash);
+
+            SetupLayoutAsync(3);
+
+            top.Add(this);
         }
 
-        private async void TelegramTerminalClientWindow_LoadedAsync()
+        private void TelegramTerminalClientWindow_Unloaded()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void TelegramTerminalClientWindow_Removed(View obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void TelegramTerminalClientWindow_Leave(FocusEventArgs obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void TelegramTerminalClientWindow_LayoutStarted(LayoutEventArgs obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void TelegramTerminalClientWindow_LayoutComplete(LayoutEventArgs obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void TelegramTerminalClientWindow_Initialized(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void TelegramTerminalClientWindow_Enter(FocusEventArgs obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void TelegramTerminalClientWindow_DrawContent(Rect obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private async void TelegramTerminalClientWindow_Added(View obj)
+        {
+            await SetupLayoutAsync(2);
+            throw new NotImplementedException();
+        }
+
+        private async Task SetupLayoutAsync(int x)
         {
             await _client.ConnectAsync();
             if (_client.IsUserAuthorized())
@@ -56,13 +125,25 @@ namespace TelegramClient
             }
             else
             {
-                var _activeView = new Dialog("Login");
-                LoginView(_activeView);
+                //var _activeView = new Dialog("Login");
+                //LoginView(_activeView);
+                var _activeView = LoginView(new Dialog("Login"));
                 this.Add(_activeView);
             }
 
             //this.Add(_activeView);
             //throw new NotImplementedException();
+        }
+
+        private void TelegramTerminalClientWindow_Ready()
+        {
+            int x = 5;
+            throw new NotImplementedException();
+        }
+
+        private async void TelegramTerminalClientWindow_LoadedAsync()
+        {
+            await SetupLayoutAsync(1);
         }
         #endregion Constructors
 
@@ -143,7 +224,8 @@ namespace TelegramClient
 
         private bool Quit()
         {
-            throw new System.NotImplementedException();
+            Application.RequestStop();
+            return true;
         }
 
         private void Close()
@@ -160,6 +242,7 @@ namespace TelegramClient
         #region Help Methods
         private void MainView(View view)
         {
+            //view = Application.Top;
             //Application.UseSystemConsole = _useSystemConsole;
             //Application.Init();
 
@@ -181,8 +264,15 @@ namespace TelegramClient
 
             // Creates a menubar, the item "New" has a help menu.
             var menu = new MenuBar(new MenuBarItem[] {
-                new MenuBarItem ("_File1", new [] {
-                    new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
+                new MenuBarItem ("_File2", new[] {
+                    new MenuItem ("_New", "Creates new file", NewFile),
+                    new MenuItem ("_Close", "", Close),
+                    new MenuItem ("_Quit", "", () => { if (Quit ()) this.Running = false; }, null, null, Key.Q | Key.CtrlMask) //top.Running => this.Running
+                }),
+                new MenuBarItem ("_Edit", new[] {
+                    new MenuItem ("_Copy", "", null),
+                    new MenuItem ("C_ut", "", null),
+                    new MenuItem ("_Paste", "", null)
                 }),
                 //new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
                 //new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
@@ -191,24 +281,14 @@ namespace TelegramClient
                     //new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/migueldeicaza/gui.cs"), null, null, Key.F2),
                     new MenuItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
                 }),
-                new MenuBarItem ("_File2", new[] {
-                    new MenuItem ("_New", "Creates new file", NewFile),
-                    new MenuItem ("_Close", "", Close),
-                    new MenuItem ("_Quit", "", () => { if (Quit ()) this.Running = false; }) //top.Running => this.Running
-                }),
-                new MenuBarItem ("_Edit", new[] {
-                    new MenuItem ("_Copy", "", null),
-                    new MenuItem ("C_ut", "", null),
-                    new MenuItem ("_Paste", "", null)
-                })
             });
 
             var _leftPane = new FrameView("Contacts")
             {
                 X = 0,
-                Y = 1, // for menu
+                Y = 0, // for menu
                 Width = 25,
-                Height = Dim.Fill(1),
+                Height = Dim.Fill(),
                 CanFocus = false,
                 Shortcut = Key.CtrlMask | Key.C
             };
@@ -232,7 +312,7 @@ namespace TelegramClient
                 X = Pos.Left(_topRightPane),
                 Y = Pos.Bottom(_topRightPane), // for menu
                 Width = Dim.Fill(),
-                Height = Dim.Fill(1),
+                Height = Dim.Fill(),
                 CanFocus = true,
                 Shortcut = Key.CtrlMask | Key.S
             };
@@ -300,12 +380,13 @@ namespace TelegramClient
                 }),
                 new StatusItem(Key.F10, "~F10~ Hide/Show Status Bar", () => {
                     _statusBar.Visible = !_statusBar.Visible;
-                    _leftPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
-                    _bottomRightPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
+                    //_leftPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
+                    //_bottomRightPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
+                    this.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
                     //_top.LayoutSubviews();
                     //_top.SetChildNeedsDisplay();
-                    //this.LayoutSubviews();
-                    //this.SetChildNeedsDisplay();
+                    this.LayoutSubviews();
+                    this.SetChildNeedsDisplay();
                 }),
             };
 
@@ -314,12 +395,14 @@ namespace TelegramClient
             this.RemoveAll();
 
             //_top.KeyDown += KeyDownHandler;
-            this.Add(menu);
-            //view.Add(_menu);
+            //view.Add(menu);
             view.Add(_leftPane);
             view.Add(_topRightPane);
             view.Add(_bottomRightPane);
-            view.Add(_statusBar);
+            //view.Add(_statusBar);
+            Application.Top.Add(menu, _statusBar);
+            //((TelegramTerminalClientWindow)view).StatusBar = _statusBar;
+            //this.StatusBar = _statusBar;
             //_top.Loaded += () =>
             //{
             //if (_runningScenario != null)
@@ -335,7 +418,7 @@ namespace TelegramClient
             //return _runningScenario;
         }
 
-        private void LoginView(View view)
+        private View LoginView(View view)
         {
             var phone = new Label("Phone Number: ")
             {
@@ -391,6 +474,8 @@ namespace TelegramClient
                 btnExit//,
                        //new Label(3, 18, "Press F9 or ESC plus 9 to activate the menubar")
             );
+
+            return view;
         }
 
         //private Pos Max(Pos i1, Pos i2)
@@ -433,19 +518,6 @@ namespace TelegramClient
             }
 
             return hash;
-        }
-
-        private static async Task TLConnect(TLSharp.Core.TelegramClient client)
-        {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-
-            var hash = await client.SendCodeRequestAsync("+");
-            var code = ""; // you can change code in debugger //TODO: Cahnge this to Console.ReadLine
-
-            var user = await client.MakeAuthAsync("+", hash, code);
         }
         #endregion Help Methods
     }

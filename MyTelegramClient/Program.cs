@@ -17,7 +17,12 @@ namespace TelegramClient
             // Application code should start here.
 
             //await host.RunAsync();
-            Application.Run(new TelegramTerminalClientWindow());
+            //Application.Run(new TelegramTerminalClientWindow());
+            //Application.Top.Add(new TelegramTerminalClientWindow());
+            var top = Application.Top;
+            var a = new TelegramTerminalClientWindow();
+            top.Add(a);
+            Application.Run();
             //Application.Run<TelegramTerminalClientWindow>();
             //Application.Run();
             //StartClient();
