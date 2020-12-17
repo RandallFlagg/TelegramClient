@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
+using TLSharp.Core;
 
 namespace TelegramClient
 {
@@ -13,9 +14,10 @@ namespace TelegramClient
     internal class TelegramTerminalClientWindow : Window
     {
         #region Fields Members
-        private bool _loggedIn = false;
-        private View _activeView;
+        private bool _loggedIn;
+        //private View _activeView;
         private ColorScheme _colorScheme;
+        private TLSharp.Core.TelegramClient _client;
         #endregion Fields Members
 
         #region Properties
@@ -24,6 +26,7 @@ namespace TelegramClient
         #region Constructors
         public TelegramTerminalClientWindow()
         {
+            this.Loaded += TelegramTerminalClientWindow_LoadedAsync;
             var top = Application.Top;
             top.Add(this);
 
@@ -37,42 +40,37 @@ namespace TelegramClient
             this.Width = Dim.Fill();
             this.Height = Dim.Fill();
 
-            // Creates a menubar, the item "New" has a help menu.
-            var menu = new MenuBar(new MenuBarItem[] {
-                new MenuBarItem ("_File", new[] {
-                    new MenuItem ("_New", "Creates new file", NewFile),
-                    new MenuItem ("_Close", "", Close),
-                    new MenuItem ("_Quit", "", () => { if (Quit ()) this.Running = false; }) //top.Running => this.Running
-                }),
-                new MenuBarItem ("_Edit", new[] {
-                    new MenuItem ("_Copy", "", null),
-                    new MenuItem ("C_ut", "", null),
-                    new MenuItem ("_Paste", "", null)
-                })
-            });
-            top.Add(menu);
+            var apiId = ;
+            var apiHash = "";
+            _client = new TLSharp.Core.TelegramClient(apiId, apiHash);
+        }
 
-            // Add some controls
-            if (_loggedIn)
+        private async void TelegramTerminalClientWindow_LoadedAsync()
+        {
+            await _client.ConnectAsync();
+            if (_client.IsUserAuthorized())
             {
-                _activeView = new FrameView();
-                MainView(_activeView);
+                //_activeView = new FrameView();
+                //MainView(_activeView);
+                MainView(this);
             }
             else
             {
-                _activeView = new Dialog("Login");
+                var _activeView = new Dialog("Login");
                 LoginView(_activeView);
+                this.Add(_activeView);
             }
 
-            this.Add(_activeView);
+            //this.Add(_activeView);
+            //throw new NotImplementedException();
         }
         #endregion Constructors
 
         #region Events/Actions
-        private void VerifyNumberView(string number)
+        private void VerifyNumberView(string phoneNumber, View view)
         {
             //TODO: Add a number verification
-            var phoneNumber = new Label($"Please make sure your phone number is {number}")
+            var phoneNumberLabel = new Label($"Your phone number is {phoneNumber}?")
             {
                 X = Pos.Center(),
                 Y = Pos.Percent(40)
@@ -81,25 +79,27 @@ namespace TelegramClient
             var btnApprove = new Button("Approve")
             {
                 X = Pos.Center() - 15,
-                Y = Pos.Percent(50)
+                Y = Pos.Percent(50),
+                IsDefault = true
             };
-            btnApprove.Clicked += () => LoginCodeView();
+            btnApprove.Clicked += () => LoginCodeView(view, phoneNumber);
 
             var btnFix = new Button("Fix")
             {
                 X = Pos.Center() + 1,
                 Y = Pos.Percent(50)
             };
-            btnFix.Clicked += () => LoginView(this);
+            btnFix.Clicked += () => LoginView(view);
 
-            this.RemoveAll();
-            this.Add(phoneNumber, btnApprove, btnFix);
-            Login();
+            view.RemoveAll();
+            view.Add(phoneNumberLabel, btnApprove, btnFix);
         }
 
-        private void LoginCodeView()
+        private void LoginCodeView(View view, string phoneNumber)
         {
-            var loginCode = new Label("Password: ")
+            var hash = GetLoginCode(phoneNumber);
+
+            var loginCodeLabel = new Label("Password: ")
             {
                 X = Pos.Center(),
                 Y = Pos.Percent(50)
@@ -108,20 +108,20 @@ namespace TelegramClient
             var loginCodeText = new TextField("")
             {
                 Secret = false,
-                X = Pos.Right(loginCode) + 1,
-                Y = Pos.Top(loginCode),
+                X = Pos.Right(loginCodeLabel) + 1,
+                Y = Pos.Top(loginCodeLabel),
                 Width = 7
             };
 
             var btnLogin = new Button("Log in")
             {
                 X = Pos.Center(),
-                Y = Pos.Percent(50)
+                Y = Pos.Top(loginCodeLabel) + 1
             };
-            btnLogin.Clicked += () => Login();
+            btnLogin.Clicked += () => Login(phoneNumber, loginCodeText.Text.ToString(), hash.Result);
 
-            this.RemoveAll();
-            this.Add(loginCode, loginCodeText, btnLogin);
+            view.RemoveAll();
+            view.Add(loginCodeLabel, loginCodeText, btnLogin);
         }
 
         private void KeyDownHandler(KeyEventEventArgs obj)
@@ -167,7 +167,7 @@ namespace TelegramClient
             //_baseColorScheme = Colors.Base;
 
             StringBuilder aboutMessage = new StringBuilder();
-            aboutMessage.AppendLine("UI Catalog is a comprehensive sample library for Terminal.Gui");
+            aboutMessage.AppendLine("Cross Platform Telegram Console UI using .NET and GUI.cs");
             aboutMessage.AppendLine(@"             _           ");
             aboutMessage.AppendLine(@"  __ _ _   _(_)  ___ ___ ");
             aboutMessage.AppendLine(@" / _` | | | | | / __/ __|");
@@ -179,8 +179,9 @@ namespace TelegramClient
             aboutMessage.AppendLine($"Using Terminal.Gui Version: {typeof(Terminal.Gui.Application).Assembly.GetName().Version}");
             aboutMessage.AppendLine("");
 
-            var _menu = new MenuBar(new MenuBarItem[] {
-                new MenuBarItem ("_File", new [] {
+            // Creates a menubar, the item "New" has a help menu.
+            var menu = new MenuBar(new MenuBarItem[] {
+                new MenuBarItem ("_File1", new [] {
                     new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
                 }),
                 //new MenuBarItem ("_Color Scheme", CreateColorSchemeMenuItems()),
@@ -189,10 +190,20 @@ namespace TelegramClient
                     //new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://migueldeicaza.github.io/gui.cs/articles/overview.html"), null, null, Key.F1),
                     //new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/migueldeicaza/gui.cs"), null, null, Key.F2),
                     new MenuItem ("_About...", "About this app", () =>  MessageBox.Query ("About UI Catalog", aboutMessage.ToString(), "_Ok"), null, null, Key.CtrlMask | Key.A),
+                }),
+                new MenuBarItem ("_File2", new[] {
+                    new MenuItem ("_New", "Creates new file", NewFile),
+                    new MenuItem ("_Close", "", Close),
+                    new MenuItem ("_Quit", "", () => { if (Quit ()) this.Running = false; }) //top.Running => this.Running
+                }),
+                new MenuBarItem ("_Edit", new[] {
+                    new MenuItem ("_Copy", "", null),
+                    new MenuItem ("C_ut", "", null),
+                    new MenuItem ("_Paste", "", null)
                 })
             });
 
-            var _leftPane = new FrameView("Categories")
+            var _leftPane = new FrameView("Contacts")
             {
                 X = 0,
                 Y = 1, // for menu
@@ -204,17 +215,29 @@ namespace TelegramClient
             _leftPane.Title = $"{_leftPane.Title} ({_leftPane.ShortcutTag})";
             _leftPane.ShortcutAction = () => _leftPane.SetFocus();
 
-            var _rightPane = new FrameView("Scenarios")
+            var _topRightPane = new FrameView("Chat Window")
             {
-                X = 25,
-                Y = 1, // for menu
+                X = Pos.Right(_leftPane),
+                Y = Pos.Top(_leftPane), // for menu
+                Width = Dim.Fill(),
+                Height = Dim.Fill(10),
+                CanFocus = true,
+                Shortcut = Key.CtrlMask | Key.S
+            };
+            _topRightPane.Title = $"{_topRightPane.Title} ({_topRightPane.ShortcutTag})";
+            _topRightPane.ShortcutAction = () => _topRightPane.SetFocus();
+
+            var _bottomRightPane = new FrameView("Input")
+            {
+                X = Pos.Left(_topRightPane),
+                Y = Pos.Bottom(_topRightPane), // for menu
                 Width = Dim.Fill(),
                 Height = Dim.Fill(1),
                 CanFocus = true,
                 Shortcut = Key.CtrlMask | Key.S
             };
-            _rightPane.Title = $"{_rightPane.Title} ({_rightPane.ShortcutTag})";
-            _rightPane.ShortcutAction = () => _rightPane.SetFocus();
+            _bottomRightPane.Title = $"{_bottomRightPane.Title} ({_bottomRightPane.ShortcutTag})";
+            _bottomRightPane.ShortcutAction = () => _bottomRightPane.SetFocus();
 
             var _categories = new List<string>() { };
             //_categories = Scenario.GetAllCategories().OrderBy(c => c).ToList();
@@ -229,7 +252,7 @@ namespace TelegramClient
             };
             _categoryListView.OpenSelectedItem += (a) =>
             {
-                _rightPane.SetFocus();
+                _topRightPane.SetFocus();
             };
             _categoryListView.SelectedItemChanged += CategoryListView_SelectedChanged;
             _leftPane.Add(_categoryListView);
@@ -247,7 +270,7 @@ namespace TelegramClient
             };
 
             _scenarioListView.OpenSelectedItem += _scenarioListView_OpenSelectedItem;
-            _rightPane.Add(_scenarioListView);
+            _topRightPane.Add(_scenarioListView);
 
             var _categoryListViewItem = -1;
             _categoryListView.SelectedItem = _categoryListViewItem;
@@ -261,6 +284,7 @@ namespace TelegramClient
             {
                 Visible = true,
             };
+
             _statusBar.Items = new StatusItem[] {
                 _capslock,
                 _numlock,
@@ -269,29 +293,33 @@ namespace TelegramClient
       //              if (_runningScenario is null){
 						//// This causes GetScenarioToRun to return null
 						//_runningScenario = null;
-      //                  Application.RequestStop();
+                        Application.RequestStop();
       //              } else {
       //                  _runningScenario.RequestStop();
       //              }
-      throw new NotImplementedException();
                 }),
                 new StatusItem(Key.F10, "~F10~ Hide/Show Status Bar", () => {
                     _statusBar.Visible = !_statusBar.Visible;
                     _leftPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
-                    _rightPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
+                    _bottomRightPane.Height = Dim.Fill(_statusBar.Visible ? 1 : 0);
                     //_top.LayoutSubviews();
                     //_top.SetChildNeedsDisplay();
+                    //this.LayoutSubviews();
+                    //this.SetChildNeedsDisplay();
                 }),
             };
 
             //SetColorScheme();
             //var _top = Application.Top;
-            var _top = view;
-            _top.KeyDown += KeyDownHandler;
-            _top.Add(_menu);
-            _top.Add(_leftPane);
-            _top.Add(_rightPane);
-            _top.Add(_statusBar);
+            this.RemoveAll();
+
+            //_top.KeyDown += KeyDownHandler;
+            this.Add(menu);
+            //view.Add(_menu);
+            view.Add(_leftPane);
+            view.Add(_topRightPane);
+            view.Add(_bottomRightPane);
+            view.Add(_statusBar);
             //_top.Loaded += () =>
             //{
             //if (_runningScenario != null)
@@ -335,9 +363,10 @@ namespace TelegramClient
             var btnLogin = new Button("Sign in")
             {
                 X = Pos.Center() - 15,
-                Y = buttonPositionY
+                Y = buttonPositionY,
+                IsDefault = true
             };
-            btnLogin.Clicked += () => VerifyNumberView(phoneText.Text.ToString());
+            btnLogin.Clicked += () => VerifyNumberView(phoneText.Text.ToString(), view);
 
             var btnExit = new Button("Exit")
             {
@@ -359,8 +388,8 @@ namespace TelegramClient
                 phone, phoneText, phoneExplanation, rememberMe,
                 //new RadioGroup(3, 8, new[] { "_Personal", "_Company" }),
                 btnLogin,
-                btnExit,
-                new Label(3, 18, "Press F9 or ESC plus 9 to activate the menubar")
+                btnExit//,
+                       //new Label(3, 18, "Press F9 or ESC plus 9 to activate the menubar")
             );
         }
 
@@ -368,37 +397,42 @@ namespace TelegramClient
         //{
         //    return i1.X > i2.X ? i1 : i2;
         //}
-
-
-        private async void Login()
+        private async void Login(string phoneNumber, string code, string hash)
         {
             try
             {
-                var apiId = ;
-                var apiHash = "";
-                Console.WriteLine("Hello World!");
-                //var session = new Session
-                //{
-                //    AuthKey = ,
-                //    Id = ,
-                //    LastMessageId = ,
-                //    Salt = ,
-                //    Sequence = ,
-                //    SessionExpires = ,
-                //    TimeOffset = ,
-                //    TLUser = 
-                //}
-                var client = new TLSharp.Core.TelegramClient(apiId, apiHash);
-                await client.ConnectAsync();
-                if (client.Session == null)
-                {
-                    await TLConnect(client);
-                }
+                var user = await _client.MakeAuthAsync(phoneNumber, hash, code);
+                MainView(this);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                int x = 5;
             }
+        }
+
+        private async Task<string> GetLoginCode(string phoneNumber)
+        {
+            string hash = null;
+            try
+            {
+                //if (_client.Session == null) //TODO: Do we need this check? Should it be changed?
+                {
+                    hash = await _client.SendCodeRequestAsync(phoneNumber);
+                    //await TLConnect(client);
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine(ex.Message); //TODO: Hanle this errors - AUTH_RESTART, PHONE_NUMBER_INVALID
+                //hash = null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                //hash = null;
+            }
+
+            return hash;
         }
 
         private static async Task TLConnect(TLSharp.Core.TelegramClient client)
