@@ -1,14 +1,16 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using TeleSharp.TL;
 using Terminal.Gui;
 
 namespace TelegramClient
 {
-    class Program
+    partial class Program
     {
+        private static MyTelegramOptions _options;
+
         static async Task Main(string[] args)
         {
             using IHost host = CreateHostBuilder(args).Build();
@@ -20,7 +22,7 @@ namespace TelegramClient
             //Application.Run(new TelegramTerminalClientWindow());
             //Application.Top.Add(new TelegramTerminalClientWindow());
             var top = Application.Top;
-            var a = new TelegramTerminalClientWindow();
+            var a = new TelegramTerminalClientWindow(_options);
             top.Add(a);
             Application.Run();
             //Application.Run<TelegramTerminalClientWindow>();
@@ -29,76 +31,26 @@ namespace TelegramClient
             //Console.WriteLine("Press any key to exit");
             //Console.ReadLine();
         }
-
-        //using Terminal.Gui;
-
         static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args);
-
-
-        private static async Task StartClient()
-        {
-            try
+            Host.CreateDefaultBuilder(args).ConfigureAppConfiguration((hostingContext, configuration) =>
             {
-                var apiId = ;
-                var apiHash = "";
-                Console.WriteLine("Hello World!");
-                //var session = new Session
-                //{
-                //    AuthKey = ,
-                //    Id = ,
-                //    LastMessageId = ,
-                //    Salt = ,
-                //    Sequence = ,
-                //    SessionExpires = ,
-                //    TimeOffset = ,
-                //    TLUser = 
-                //}
-                var client = new TLSharp.Core.TelegramClient(apiId, apiHash);
-                await client.ConnectAsync();
-                if (client.Session == null)
-                {
-                    await TLConnect(client);
-                }
+                configuration.Sources.Clear();
 
-                // this is because the contacts in the address come without the "+" prefix
-                string NumberToSendMessage = "+";
-                var normalizedNumber = NumberToSendMessage.StartsWith("+") ?
-                    NumberToSendMessage.Substring(1, NumberToSendMessage.Length - 1) :
-                    NumberToSendMessage;
+                IHostEnvironment env = hostingContext.HostingEnvironment;
 
-                var result = await client.GetContactsAsync();
+                configuration
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true);
 
-                var user = result.Users
-                    .OfType<TLUser>()
-                    .FirstOrDefault(x => (x.Phone == normalizedNumber));
+                IConfigurationRoot configurationRoot = configuration.Build();
 
-                if (user == null)
-                {
-                    throw new System.Exception("Number was not found in Contacts List of user: " + NumberToSendMessage);
-                }
+                //var options = new MyTelegramOptions();
+                _options = new MyTelegramOptions();
+                configurationRoot.GetSection(nameof(MyTelegramOptions)).Bind(_options);
 
-                var a = await client.SendMessageAsync(new TLInputPeerUser { UserId = user.Id }, "TEST2");
-                int x = 5;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                //throw;
-            }
-        }
-
-        private static async Task TLConnect(TLSharp.Core.TelegramClient client)
-        {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-
-            var hash = await client.SendCodeRequestAsync("+");
-            var code = ""; // you can change code in debugger //TODO: Cahnge this to Console.ReadLine
-
-            var user = await client.MakeAuthAsync("+", hash, code);
-        }
+                Console.WriteLine($"MyTelegramOptions.apiHash={_options.apiHash}");
+                Console.WriteLine($"MyTelegramOptions.apiId={_options.apiId}");
+                Console.WriteLine($"MyTelegramOptions.phoneNumber={_options.phoneNumber}");
+            });
     }
 }
