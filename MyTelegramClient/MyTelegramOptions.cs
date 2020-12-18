@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TelegramClient
+namespace MyTelegramClient
 {
     /// <summary>
     /// A sample JSON file created by this record:

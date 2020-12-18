@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Terminal.Gui;
 
-namespace TelegramClient
+namespace MyTelegramClient
 {
     partial class Program
     {
@@ -15,6 +15,9 @@ namespace TelegramClient
         {
             using IHost host = CreateHostBuilder(args).Build();
 
+            var telegram = new TelegramHelper(_options);
+            await telegram.ConnectAsync();
+
             Application.Init();
             // Application code should start here.
 
@@ -22,8 +25,8 @@ namespace TelegramClient
             //Application.Run(new TelegramTerminalClientWindow());
             //Application.Top.Add(new TelegramTerminalClientWindow());
             var top = Application.Top;
-            var a = new TelegramTerminalClientWindow(_options);
-            top.Add(a);
+            var window = new TelegramTerminalClientWindow(telegram);
+            top.Add(window);
             Application.Run();
             //Application.Run<TelegramTerminalClientWindow>();
             //Application.Run();

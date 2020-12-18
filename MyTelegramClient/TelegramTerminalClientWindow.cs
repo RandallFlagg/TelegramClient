@@ -4,9 +4,8 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
-using TLSharp.Core;
 
-namespace TelegramClient
+namespace MyTelegramClient
 {
     /// <summary>
     /// The top-level window to show
@@ -17,15 +16,16 @@ namespace TelegramClient
         private bool _loggedIn;
         //private View _activeView;
         private ColorScheme _colorScheme;
-        private TLSharp.Core.TelegramClient _client;
+        private TelegramHelper _telegram;
         #endregion Fields Members
 
         #region Properties
         #endregion Properties
 
         #region Constructors
-        public TelegramTerminalClientWindow()
+        public TelegramTerminalClientWindow(TelegramHelper telegram)
         {
+            _telegram = telegram;
             //this.Loaded += TelegramTerminalClientWindow_LoadedAsync;
             //this.Ready += TelegramTerminalClientWindow_Ready;
             //this.Added += TelegramTerminalClientWindow_Added;
@@ -50,18 +50,6 @@ namespace TelegramClient
             this.Width = Dim.Fill();
             this.Height = Dim.Fill(1);
 
-            this.Add(new FrameView("TEST1")
-            {
-                Width = 25,
-                Height = 25,
-                X = 0,
-                Y = 1 // for menu
-            });
-
-            var apiId = ;
-            var apiHash = "";
-
-            _client = new TLSharp.Core.TelegramClient(apiId, apiHash);
 
             SetupLayoutAsync(3);
 
@@ -110,14 +98,12 @@ namespace TelegramClient
 
         private async void TelegramTerminalClientWindow_Added(View obj)
         {
-            await SetupLayoutAsync(2);
             throw new NotImplementedException();
         }
 
-        private async Task SetupLayoutAsync(int x)
+        private void SetupLayoutAsync(int x)
         {
-            await _client.ConnectAsync();
-            if (_client.IsUserAuthorized())
+            if (_telegram.IsUserAuthorized)
             {
                 //_activeView = new FrameView();
                 //MainView(_activeView);
@@ -143,7 +129,7 @@ namespace TelegramClient
 
         private async void TelegramTerminalClientWindow_LoadedAsync()
         {
-            await SetupLayoutAsync(1);
+            throw new NotImplementedException();
         }
         #endregion Constructors
 
@@ -292,6 +278,7 @@ namespace TelegramClient
                 CanFocus = false,
                 Shortcut = Key.CtrlMask | Key.C
             };
+            _leftPane.Added += _leftPane_Added;
             _leftPane.Title = $"{_leftPane.Title} ({_leftPane.ShortcutTag})";
             _leftPane.ShortcutAction = () => _leftPane.SetFocus();
 
@@ -392,7 +379,7 @@ namespace TelegramClient
 
             //SetColorScheme();
             //var _top = Application.Top;
-            this.RemoveAll();
+            view.RemoveAll();
 
             //_top.KeyDown += KeyDownHandler;
             //view.Add(menu);
@@ -418,6 +405,13 @@ namespace TelegramClient
             //return _runningScenario;
         }
 
+        private void _leftPane_Added(View obj)
+        {
+            //TelegramHelper fg;
+            //fg.GetContacts();
+            //obj.Subviews.Add();
+        }
+
         private View LoginView(View view)
         {
             var phone = new Label("Phone Number: ")
@@ -426,7 +420,7 @@ namespace TelegramClient
                 Y = 2
             };
 
-            var phoneText = new TextField()
+            var phoneText = new TextField("")
             {
                 X = Pos.Right(phone),
                 Y = Pos.Top(phone),
@@ -484,14 +478,34 @@ namespace TelegramClient
         //}
         private async void Login(string phoneNumber, string code, string hash)
         {
-            try
+            var success = false;
+            while (!success)
             {
-                var user = await _client.MakeAuthAsync(phoneNumber, hash, code);
-                MainView(this);
-            }
-            catch (Exception ex)
-            {
-                int x = 5;
+                try
+                {
+                    success = true;
+                    var user = await _telegram.LoginAsync(phoneNumber, hash, code);
+                    MainView(this);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    string message;
+                    switch (ex.Message)
+                    {
+                        case "PHONE_CODE_EXPIRED":
+                            hash = await GetLoginCode(phoneNumber);
+                            message = "The code has expired. a new code was sent to your device. Please try again.";
+                            break;
+                        default:
+                            throw new NotImplementedException($"Please give this error to the developer: {ex.Message}");
+                    }
+
+                    //TODO: Add a message to the screen
+                }
+                catch (Exception ex)
+                {
+                    int x = 5;
+                }
             }
         }
 
@@ -502,7 +516,7 @@ namespace TelegramClient
             {
                 //if (_client.Session == null) //TODO: Do we need this check? Should it be changed?
                 {
-                    hash = await _client.SendCodeRequestAsync(phoneNumber);
+                    hash = await _telegram.SendCodeRequestAsync(phoneNumber);
                     //await TLConnect(client);
                 }
             }
