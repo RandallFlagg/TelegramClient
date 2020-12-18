@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
+using TgSharp.TL;
 
 namespace MyTelegramClient
 {
@@ -407,9 +409,32 @@ namespace MyTelegramClient
 
         private void _leftPane_Added(View obj)
         {
-            //TelegramHelper fg;
-            //fg.GetContacts();
-            //obj.Subviews.Add();
+            Task.Run(async () =>
+            {
+                var contacts = await _telegram.GetContactsAsync();
+                var contactsList = contacts.Users.OfType<TLUser>().Select(user => new
+                {
+                    Name = $"{user.FirstName} {user.LastName}",
+                    Id = user.Id
+                });
+                var contactsListView = new ListView(contactsList.Select(user=>user.Name).ToArray())
+                {
+                    X = 0,
+                    Y = 0,
+                    Width = Dim.Fill(0),
+                    Height = Dim.Fill(0),
+                    AllowsMarking = false,
+                    CanFocus = true,
+                };
+                contactsListView.SelectedItemChanged += ContactsListView_SelectedItemChanged;
+                obj.Subviews[0].Add(contactsListView); //TODO: Find a way to do this correctlly
+            });
+        }
+
+        private void ContactsListView_SelectedItemChanged(ListViewItemEventArgs obj)
+        {
+            GetChatHistory(contactsList[Name].Id);
+            throw new NotImplementedException();
         }
 
         private View LoginView(View view)
@@ -420,7 +445,7 @@ namespace MyTelegramClient
                 Y = 2
             };
 
-            var phoneText = new TextField("")
+            var phoneText = new TextField("+972504443975")
             {
                 X = Pos.Right(phone),
                 Y = Pos.Top(phone),

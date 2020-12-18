@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 #if TELESHARP
 using TLSharp.Core;
@@ -6,7 +7,7 @@ using TeleSharp.TL;
 #else
 using TgSharp.Core;
 using TgSharp.TL;
-
+using TgSharp.TL.Contacts;
 #endif
 
 namespace MyTelegramClient
@@ -51,7 +52,9 @@ namespace MyTelegramClient
         {
             return await _client.SendCodeRequestAsync(phoneNumber);
         }
-#endregion Methods
+
+        internal async Task<TLContacts> GetContactsAsync() => await _client.GetContactsAsync();
+        #endregion Methods
     }
 
 }
