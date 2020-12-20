@@ -15,7 +15,7 @@ namespace MyTelegramClient
         {
             using IHost host = CreateHostBuilder(args).Build();
 
-            var telegram = new TelegramHelper(_options);
+            var telegram = new TelegramWrapper(_options);
             await telegram.ConnectAsync();
 
             Application.Init();

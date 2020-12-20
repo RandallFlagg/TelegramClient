@@ -18,14 +18,14 @@ namespace MyTelegramClient
         private bool _loggedIn;
         //private View _activeView;
         private ColorScheme _colorScheme;
-        private TelegramHelper _telegram;
+        private TelegramWrapper _telegram;
         #endregion Fields Members
 
         #region Properties
         #endregion Properties
 
         #region Constructors
-        public TelegramTerminalClientWindow(TelegramHelper telegram)
+        public TelegramTerminalClientWindow(TelegramWrapper telegram)
         {
             _telegram = telegram;
             //this.Loaded += TelegramTerminalClientWindow_LoadedAsync;
@@ -426,15 +426,25 @@ namespace MyTelegramClient
                     AllowsMarking = false,
                     CanFocus = true,
                 };
-                contactsListView.SelectedItemChanged += ContactsListView_SelectedItemChanged;
+                contactsListView.SelectedItemChanged += ContactsListView_SelectedItemChangedAsync;
                 obj.Subviews[0].Add(contactsListView); //TODO: Find a way to do this correctlly
             });
         }
 
-        private void ContactsListView_SelectedItemChanged(ListViewItemEventArgs obj)
+        private void ContactsListView_SelectedItemChangedAsync(ListViewItemEventArgs obj)
         {
-            GetChatHistory(contactsList[Name].Id);
-            throw new NotImplementedException();
+            //TODO: //FIXME: Not Working
+            Task.Run(async () =>
+            {
+                var a = await _telegram.GetUserDialogsAsync();
+                //a.
+                //var b = await _telegram.GetHistoryAsync();
+                int x = 5;
+                //TLUser client = null;
+                //client.dialo GetUserDialogsAsync()
+                //GetChatHistory(contactsList[Name].Id);
+                //throw new NotImplementedException();
+            });
         }
 
         private View LoginView(View view)
