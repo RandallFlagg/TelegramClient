@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30717.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TLSharp.CoreCore", "..\..\Lib\TLSharp\TLSharp.Core\TLSharp.CoreCore.csproj", "{20E1BB6F-7710-42AD-A66B-8AFADC9AE22D}"
 EndProject
@@ -12,6 +12,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyTelegramClient", "MyTelegramClient\MyTelegramClient.csproj", "{1489EA72-A8A4-4DF9-9EC2-FD14DA6DB060}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{37ED6800-AA40-465A-B67A-AECDE659F0E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyWinFormClient", "MyWinFormClient\MyWinFormClient.csproj", "{86384122-8B2B-4C67-A2CA-23A9E05E8443}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramClientLib", "TelegramClientLib\TelegramClientLib.csproj", "{AEEE8DFE-D517-4373-A2B6-5C8007541D9D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +39,14 @@ Global
 		{1489EA72-A8A4-4DF9-9EC2-FD14DA6DB060}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1489EA72-A8A4-4DF9-9EC2-FD14DA6DB060}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1489EA72-A8A4-4DF9-9EC2-FD14DA6DB060}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86384122-8B2B-4C67-A2CA-23A9E05E8443}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86384122-8B2B-4C67-A2CA-23A9E05E8443}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86384122-8B2B-4C67-A2CA-23A9E05E8443}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86384122-8B2B-4C67-A2CA-23A9E05E8443}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEEE8DFE-D517-4373-A2B6-5C8007541D9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEEE8DFE-D517-4373-A2B6-5C8007541D9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEEE8DFE-D517-4373-A2B6-5C8007541D9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEEE8DFE-D517-4373-A2B6-5C8007541D9D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
